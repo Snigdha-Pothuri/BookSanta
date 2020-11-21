@@ -56,13 +56,38 @@ request_status : "Donor Interested"
 
      componentDidMount () {
         this.getReceiverDetails();
+        this.getUserDetails();
      }
+
+     addNotification = () => {
+         var message = this.state.userName + "Has shown interest to donate a book"
+         db.collection("all_notifications").add({
+             "targetedUserId" : this.state.receiverId,
+             donorId : this.state.userId,
+             requestId : this.state.requestId,
+             bookName : this.state.bookName,
+             date : firebase.firestore.FieldValue.serverTimestamp(),
+             notificationStatus : "unread",
+             message : message
+         })
+             
+     } 
+     getUserDetails =  (userId) =>  {
+        db.collection("users").where("email_id","==",userId).get()
+        .then(snapshot=>{
+            snapshot.forEach(doc=>{
+                this.setState({
+                   userName : doc.data().first_name + " " + doc.data().last_name 
+                })
+            })
+        })
+    }
 
    render () {
        return(
            <View style={{flex:1}}>
                  <Header 
-          leftComponent = {<Icon name="bars" type="font-awesome" color="blue" 
+          leftComponent = {<Icon name="arrow-left" type="font-awesome" color="blue" 
           onPress={()=>props.navigation.goBack()}
           />
 }
@@ -108,6 +133,7 @@ request_status : "Donor Interested"
                    ? (
                        <TouchableOpacity
                        onPress={()=>{this.updateBookStatus()
+                        this.addNotification()
                       this.props.navigation.navigate("MyDonations")
                     }}
                        >
