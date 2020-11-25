@@ -1,85 +1,91 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image,FlatList,TouchableOpacity,Alert } from 'react-native';
-import {ListItem} from 'react-native-elements';
-import MyHeader from '../components/MyHeader';
-import db from '../config';
+import React, { Component } from 'react';
+import { StyleSheet, View, FlatList,Text } from 'react-native';
+import { ListItem, Icon } from 'react-native-elements';
 import firebase from 'firebase';
+import MyHeader from '../components/MyHeader';
+import SwipableFlatlist from '../components/SwipableFlatlist';
+import db from '../config';
 
-export default class NotificationScreen extends React.Component {
-  constructor(props){
+export default class NotificationScreen extends Component{
+  constructor(props) {
     super(props);
-    this.state = {
-      allNotifications : [],
-      userId : firebase.auth().currentUser.email
-    }
-    this.requestRef = null
 
-  } 
-  getNotifications = () => {
-   this.requestRef = db.collection("all_notifications")
-   .where("notification_status","==","unread")
-   .where("targeted_user_id","==",this.state.userId )
-   .onSnapshot((snapshot)=>{
-       var allNotifications=[]
-    snapshot.docs.map((doc)=>{
-        var donation = doc.data()
-        donation["doc_id"]=doc.id
-        allNotifications.push(donation)
-      })
-     
+    this.state = {
+      userId :  firebase.auth().currentUser.email,
+      allNotifications : []
+    };
+
+    this.notificationRef = null
+  }
+
+  getNotifications=()=>{
+    this.notificationRef = db.collection("all_notifications")
+    .where("notification_status", "==", "unread")
+    .where("targeted_user_id",'==',this.state.userId)
+    .onSnapshot((snapshot)=>{
+      var allNotifications =  []
+      snapshot.docs.map((doc) =>{
+        var notification = doc.data()
+        notification["doc_id"] = doc.id
+        allNotifications.push(notification)
+      });
       this.setState({
-        allNotifications : allNotifications
-      })
+          allNotifications : allNotifications
+      });
     })
-  } 
-componentDidMount (){
-  this.getNotifications()  
-}
-  componentWillUnmount (){
-    this.requestRef()
   }
-  keyExtractor = (item,index)=>
-    index.toString();
-  renderItem = ({item,i}) => {
-    return (
-    <ListItem
-       key={i}
-       title = {item.book_Name}
-       subtitle = {item.message}
-       titleStyle = {{color:"black",fontWeight:"bold"}}
-       leftElement = {<Icon
-        name = "book" type="font-awesome" color = "yellow"
-/>}
-         
-       bottomDivider 
-    />
-    )
+
+  componentDidMount(){
+    this.getNotifications()
   }
+
+  componentWillUnmount(){
+    this.notificationRef()
+  }
+
+  keyExtractor = (item, index) => index.toString()
+
+  renderItem = ({item,index}) =>{
+      return (
+        <ListItem
+          key={index}
+          leftElement={<Icon name="book" type="font-awesome" color ='#696969'/>}
+          title={item.book_name}
+          titleStyle={{ color: 'black', fontWeight: 'bold' }}
+          subtitle={item.message}
+          bottomDivider
+        />
+      )
+ }
+
 
   render(){
-    return (
-      <View style={{flex:1}}>
-        <MyHeader title="Notifications" 
-          navigation= {this.props.navigation}
-        />
-        <View style={{flex:1}}>
-           {
-             this.state.allNotifications.length === 0
-             ? (
-               <View>
-                 <Text> You have no notifications </Text>
-               </View>
-             ) 
-             : (
-               <FlatList
-                  keyExtractor = {this.keyExtractor}
-                  data = {this.state.requestedBookList}
-                  renderItem = {this.renderItem}
-               />
-             )
-           }
+    return(
+      <View style={styles.container}>
+        <View style={{flex:0.1}}>
+          <MyHeader title={"Notifications"} navigation={this.props.navigation}/>
+        </View>
+        <View style={{flex:0.9}}>
+          {
+            this.state.allNotifications.length === 0
+            ?(
+              <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+                <Text style={{fontSize:25}}>You have no notifications</Text>
+              </View>
+            )
+            :(
+              <SwipeableFlatlist allNotifications={this.state.allNotifications}/>
+            )
+          }
         </View>
       </View>
-    );
+    )
   }
 }
+
+
+const styles = StyleSheet.create({
+  container : {
+    flex : 1
+  }
+})

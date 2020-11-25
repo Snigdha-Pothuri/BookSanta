@@ -10,13 +10,20 @@ export default class BookRequestScreen extends React.Component {
      this.state = {
        userId : firebase.auth().currentUser.email,
        bookName : "",
-       reasonToRequest : ""
+       reasonToRequest : "",
+       isBookRequestActive : "",
+       requestedBookName : "",
+       bookStatus : "",
+       requestId : "",
+        userDocId : "",
+        docId : "",
+
      }
    }
    createUniqueId(){
      return Math.random().toString(36).substring(7);
    }
-   addRequest =(bookName,reasonToRequest)=>
+   addRequest = async (bookName,reasonToRequest)=>
    {
      var userId = this.state.userId
      var randomRequestId = this.createUniqueId();
@@ -24,14 +31,61 @@ export default class BookRequestScreen extends React.Component {
        "user_id" : userId,
        "book_Name": bookName,
        "reasonToRequest": reasonToRequest,
-       "requestId" : randomRequestId
+       "requestId" : randomRequestId,
+       "book_status":"requested",
+       "date" : firebase.firestore.FieldValue.serverTimestamp()
+     })
+     await this.getBookRequest()
+     db.collection("users").where("email_id","==",userId).get()
+     .then((snapshot)=>{
+          snapshot.forEach((doc)=>{
+            db.collection("users").doc(doc.id).update({isBookRequestActive : true})
+          })
      })
      this.setState ({
        bookName : "",
-       reasonToRequest : ""
-
+       reasonToRequest : "",
+      requestId : randomRequestId
      })
     return Alert.alert("Book Succesfully Requested")
+    } 
+    receivedBooks = (book_Name) => {
+      var userId  = this.state.userId
+      var requestId = this.state.requestId
+      db.collection("received_books").add({
+        "user_id" : userId,
+        "book_Name" : book_Name,
+        "request_id" : requestId,
+       "bookStatus" : "received"
+      })
+    } 
+    getIsBookRequestActive () {
+      db.collection("users").where("email_id","==",this.state.userId)
+      .onSnapshot((snapshot)=>{
+        snapshot.forEach((doc)=>{
+          this.setState({
+            isBookRequestActive : doc.data().isBookRequestActive,
+            userDocId : doc.id
+          })
+        })
+      })
+    } 
+    getBookRequest = () => {
+      var bookRrequest = db.collection("requested_books")
+      .where("user_id","==",this.state.userId)
+      .get()
+      .then((snapshot)=> {
+        snapshot.forEach((doc)=> {
+          if(doc.data().book_status !== "received") {
+            this.setState({
+              requestId : doc.data().requested_id,
+              requestedBookName : doc.data().book_Name,
+              bookStatus : doc.data().book_status,
+              docId : doc.id
+            })
+          }
+        })
+      })
     }
   render(){
     return (

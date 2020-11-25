@@ -56,18 +56,18 @@ request_status : "Donor Interested"
 
      componentDidMount () {
         this.getReceiverDetails();
-        this.getUserDetails();
+        this.getUserDetails(this.state.userId);
      }
 
      addNotification = () => {
          var message = this.state.userName + "Has shown interest to donate a book"
          db.collection("all_notifications").add({
-             "targetedUserId" : this.state.receiverId,
+             "targeted_user_Id" : this.state.receiverId,
              donorId : this.state.userId,
              requestId : this.state.requestId,
              bookName : this.state.bookName,
              date : firebase.firestore.FieldValue.serverTimestamp(),
-             notificationStatus : "unread",
+             notification_status : "unread",
              message : message
          })
              
@@ -88,7 +88,7 @@ request_status : "Donor Interested"
            <View style={{flex:1}}>
                  <Header 
           leftComponent = {<Icon name="arrow-left" type="font-awesome" color="blue" 
-          onPress={()=>props.navigation.goBack()}
+          onPress={()=>this.props.navigation.goBack()}
           />
 }
           centerComponent = {{text : "Donate Books",style:{color:"black",fontSize:30,fontWeight:"bold"}}}
