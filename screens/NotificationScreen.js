@@ -21,7 +21,7 @@ export default class NotificationScreen extends Component{
   getNotifications=()=>{
     this.notificationRef = db.collection("all_notifications")
     .where("notification_status", "==", "unread")
-    .where("targeted_user_id",'==',this.state.userId)
+    .where("targeted_user_Id",'==',this.state.userId)
     .onSnapshot((snapshot)=>{
       var allNotifications =  []
       snapshot.docs.map((doc) =>{
@@ -74,7 +74,7 @@ export default class NotificationScreen extends Component{
               </View>
             )
             :(
-              <SwipeableFlatlist allNotifications={this.state.allNotifications}/>
+              <SwipableFlatlist allNotifications={this.state.allNotifications}/>
             )
           }
         </View>

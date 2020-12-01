@@ -14,11 +14,12 @@ export default class MyHeader extends React.Component {
     db.collection("all_notifications").where("notification_status","==","unread")
     .onSnapshot((snapshot)=>{
       var unreadNotifications = snapshot.docs.map((doc)=>{
-        doc.data()
-        this.setState({
-          value : unreadNotifications
-        })
+        doc.data() 
       })
+        this.setState({
+          value : unreadNotifications.length
+        })
+    
     })
   } 
   componentDidMount () {

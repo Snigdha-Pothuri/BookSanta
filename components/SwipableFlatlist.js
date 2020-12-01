@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, FlatList,Text,Dimensions,Animated } from 'react-native';
 import {ListItem,Icon} from 'react-native-elements';
-import {SwipeListView} from 'react-native-swipe-list-view'
+import {SwipeListView} from 'react-native-swipe-list-view';
+import db from '../config';
  
 export default class SwipableFlatlist extends React.Component { 
     constructor (props) {
@@ -15,9 +16,9 @@ export default class SwipableFlatlist extends React.Component {
         const {key,value} = swipeData
         if (value < -Dimensions.get("window").width) {
            const newData = [...allNotifications]
-           const prevIndex = allNotifications.findIndex(item=>{
+           const prevIndex = allNotifications.findIndex(item=>
                item.key === key
-           })
+           )
            this.updateMarkAsRead(allNotifications[prevIndex])
            newData.splice(prevIndex,1)
            this.setState({
@@ -31,7 +32,7 @@ export default class SwipableFlatlist extends React.Component {
             notification_status : "read"
         })
      }
-     renderItem = data => {
+     renderItem = data => (
       <Animated.View>
 
         <ListItem
@@ -47,15 +48,15 @@ export default class SwipableFlatlist extends React.Component {
         />
                  
       </Animated.View>
-      }
+     )
 
-      renderHiddenItem =()=>{
+      renderHiddenItem =()=>(
 <View     style={styles.rowBack}>
 <View style={[styles.backRightButton,styles.backRight]}>
 <Text style={styles.backText}>  </Text>
 </View>
 </View>          
-      }
+      )
     
     render () {
         return (
@@ -74,7 +75,7 @@ export default class SwipableFlatlist extends React.Component {
             </View>
         )
     }
-} 
+}
 
 const styles = StyleSheet.create({
     rowBack : {

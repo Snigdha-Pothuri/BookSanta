@@ -86,8 +86,71 @@ export default class BookRequestScreen extends React.Component {
           }
         })
       })
-    }
+    } 
+    sendNotification = () => {
+      db.collection("users").where("email_id","==",this.state.userId).get()
+      .then((snapshot)=> {
+        snapshot.forEach((doc)=> {
+          var name = doc.data().first_name
+          var last_name = doc.data().last_name
+          db.collection("all_notifications").where("requestId","==",this.state.requestId).get()
+          .then((snapshot)=>{
+            snapshot.forEach((doc)=>{
+              var donorId = doc.data().donorId
+              var bookName = doc.data().bookName
+              db.collection("all_notifications").add({
+                "targeted_user_id" : donorId,
+                "message" : name + " " + last_name + "Received the book" + bookName,
+                "notification_status" : "unread",
+                "book_name" : bookName
+              })
+            })
+          })
+        })
+      })
+    } 
+    componentDidMount () {
+      this.getBookRequest();
+      this.getIsBookRequestActive();
+    } 
+  updateBookRequestStatus = () => {
+    db.collection("requested_books").doc(this.state.docId)
+    .update({
+    book_status : "Received"
+  }) 
+  db.collection("users").where("email_id","==",this.state.userId).get()
+  .then((snapshot)=>{
+    snapshot.forEach((doc)=>{
+      db.collection("users").doc(doc.id).update({
+        isBookRequestActive : false
+      })
+    })
+  })
+  } 
+  
   render(){
+    if(this.state.isBookRequestActive === true){
+      return (
+        <View style={{flex:1,justifyContent:"center"}}>
+           <Text>
+             Book Name
+           </Text>
+           <Text> {this.state.requestedBookName} </Text>
+           <Text> Book Status </Text>
+           <Text> {this.state.bookStatus} </Text>
+           <TouchableOpacity style={{borderWidth:1,backgroundColor:"yellow",alignSelf:"center",width:300}}
+           onPress={()=>{this.sendNotification()
+          this.updateBookRequestStatus()
+          this.receivedBooks(this.state.requestedBookName)}}
+           >
+<Text> I received the book </Text> 
+           </TouchableOpacity>
+        </View>
+      )
+    } 
+  else {
+
+ 
     return (
        
       <View style={{flex:1}}>
@@ -128,7 +191,9 @@ export default class BookRequestScreen extends React.Component {
       </KeyboardAvoidingView>
      
       </View>
+    
     );
+  }
   }
 } 
 const styles = StyleSheet.create({
