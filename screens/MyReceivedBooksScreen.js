@@ -16,7 +16,7 @@ export default class MyReceivedBooks extends React.Component {
 
   } 
   getReceivedBookList = () => {
-   this.requestRef = db.collection("requested_books")
+   this.requestRef = db.collection("received_books")
    .where("user_id","==",this.state.userId)
    .where("bookStatus","==","received")
    

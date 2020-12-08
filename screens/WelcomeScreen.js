@@ -8,7 +8,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     Alert,
-    ScrollView} from 'react-native';
+    ScrollView,
+  Image} from 'react-native';
 import db from '../config';
 import firebase from 'firebase';
 
@@ -84,7 +85,9 @@ showModal = ()=>{
         <KeyboardAvoidingView style={styles.KeyboardAvoidingView}>
         <Text
           style={styles.modalTitle}
-          >Registration</Text>
+          >Registration</Text> 
+
+
         <TextInput
           style={styles.formTextInput}
           placeholder ={"First Name"}
@@ -183,14 +186,24 @@ showModal = ()=>{
       <View style={styles.container}>
         <View style={{justifyContent: 'center',alignItems: 'center'}}>
 
-        </View>
+        </View> 
+
           {
             this.showModal()
           }
         <View style={{justifyContent:'center', alignItems:'center'}}>
+        <Image
+   source = {
+    require("../assets/santa.jpg")
+   } 
+   style={{width:"50%",height:"100%"}}
+   resizeMode = {"stretch"}
+/>
           <Text style={styles.title}>Book Santa</Text>
         </View>
-        <View>
+        <View> 
+          
+
             <TextInput
             style={styles.loginBox}
             placeholder="abc@example.com"

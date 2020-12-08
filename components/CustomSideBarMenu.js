@@ -2,10 +2,12 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'; 
 import {DrawerItems} from 'react-navigation-drawer'; 
 import firebase from 'firebase'; 
-import {Avatar} from 'react-native-elements';
+import {Avatar,Icon} from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import db from '../config';
+import {RFValue} from 'react-native-responsive-fontsize';
+
 
 export default class CustomSideBarMenu extends React.Component {
   constructor () {
@@ -51,7 +53,7 @@ export default class CustomSideBarMenu extends React.Component {
   } 
   getUserProfile () {
     db.collection("users").where("email_id","==",this.state.userId)
-    onSnapshot((snapshot)=>{
+    .onSnapshot((snapshot)=>{
       snapshot.forEach((doc)=>{
         this.setState({
           name : doc.data().first_name + " " + doc.data().last_name,
@@ -67,9 +69,8 @@ export default class CustomSideBarMenu extends React.Component {
   }
  render (){
      return ( 
-         <View>
          <View style={{flex:1}}>
-           <View style={{flex:0.5,alignItems:"center",backgroundColor:"orange"}}>
+         <View style={{flex:0.5,alignItems:"center",backgroundColor:"orange"}}>
               <Avatar
                  rounded 
                  source = {{uri:this.state.image}}
@@ -80,6 +81,7 @@ export default class CustomSideBarMenu extends React.Component {
               />
               <Text style={{fontWeight : "bold",fontSize:20,paddingTop : 10}}> {this.state.name} </Text>
            </View>
+<View>
 
            <DrawerItems
                 {
@@ -87,14 +89,22 @@ export default class CustomSideBarMenu extends React.Component {
                }
            />
          </View>
-         <View> 
-           <TouchableOpacity 
+         <View>
+           <TouchableOpacity  style={{flexDirection:"row",width:"100%",height:"100%"}}
              onPress={()=>{
                  this.props.navigation.navigate("WelcomeScreen")
                  firebase.auth().signOut()
-             }}
+             }
+            
+            }
            >
-            <Text> Log Out </Text>
+             <Icon
+             name="logout"
+             type = "antdesign"
+             size = {RFValue(20)}
+             iconStyle={{paddingLeft:RFValue(10)}}
+             />
+            <Text style={{fontWeight:"bold",marginLeft:RFValue(30),fontSize:RFValue(10)}}> Log Out </Text>
            </TouchableOpacity>
          </View> 
 
@@ -107,7 +117,7 @@ export default class CustomSideBarMenu extends React.Component {
 const styles=StyleSheet.create({
   imageContainer:{
       width:"40%",
-      height:"20%",
+      height:"40%",
       alignSelf:'center',
       borderColor:'#ffab91',
       borderRadius:40,
